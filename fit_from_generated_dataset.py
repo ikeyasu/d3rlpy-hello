@@ -4,10 +4,12 @@ from sklearn.model_selection import train_test_split
 import argparse
 
 parser = argparse.ArgumentParser()
+parser.add_argument("-g", "--gpu", action="store_true",
+                    help="use GPU")
 parser.add_argument("-e", "--env", type=str, default="CartPole-v1",
                     help="gym environment")
 parser.add_argument("-c", "--collect-type", type=str, default="random", choices=["random", "training"],
-                    help="gym environment")
+                    help="`random` uses DiscreteRandomPolicy, `training` uses DiscreteSAC")
 args = parser.parse_args()
 
 env = gym.make(args.env)
@@ -27,7 +29,7 @@ elif args.collect_type == "training":
     dataset = replay_buffer.to_mdp_dataset()
 
 # setup CQL algorithm
-cql = d3rlpy.algos.DiscreteCQL(use_gpu=False)
+cql = d3rlpy.algos.DiscreteCQL(use_gpu=args.gpu)
 
 # split train and test episodes
 train_episodes, test_episodes = train_test_split(dataset, test_size=0.2)
